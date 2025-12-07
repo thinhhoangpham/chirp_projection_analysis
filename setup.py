@@ -43,6 +43,7 @@ setup(
     name="chirp_cython",
     version="1.0.0",
     description="Cython-accelerated CHIRP projection analysis modules",
+    packages=['chirp_cython'],
     ext_modules=cythonize(
         extensions,
         compiler_directives={

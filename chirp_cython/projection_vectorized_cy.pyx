@@ -46,6 +46,14 @@ def compute_bounds_cy(data_source, wi, transforms, n_pts):
     if cached_bounds is not None:
         return cached_bounds
     
+    # Declare C variables first
+    cdef int i, j, nwt
+    cdef double data_val, wt, xi_transformed
+    cdef double min_val = 1.0 / 0.0  # Inf
+    cdef double max_val = -1.0 / 0.0  # -Inf
+    cdef int n_terms = len(wi)
+    cdef double bounds_range, center
+    
     # Pre-compute all transformed features for this projection
     transformed_features = []
     for j in range(len(wi)):
@@ -55,13 +63,6 @@ def compute_bounds_cy(data_source, wi, transforms, n_pts):
             data_source.data, wij, transform_type, cache=_computation_cache
         )
         transformed_features.append(transformed_col)
-    
-    cdef int i, j, nwt
-    cdef double data_val, wt, xi_transformed
-    cdef double min_val = 1.0 / 0.0  # Inf
-    cdef double max_val = -1.0 / 0.0  # -Inf
-    cdef int n_terms = len(wi)
-    cdef double bounds_range, center
     
     # Convert to numpy arrays for efficient access
     cdef np.ndarray[np.float64_t, ndim=2] transform_matrix = np.stack(
@@ -148,6 +149,14 @@ def fill_array_cy(wi, transforms, bounds, data_source, n_pts):
         print(f"Warning: Invalid bounds detected (bounds={bounds}, range={bounds_range}), returning zeros")
         return np.zeros(n_pts)
     
+    # Declare C variables first
+    cdef int i, j, nwt
+    cdef double projection_val, wt, xi_transformed
+    cdef int n_terms = len(wi)
+    cdef int total_invalid_points = 0
+    cdef int partial_invalid_points = 0
+    cdef int valid_points = 0
+    
     # Pre-compute all transformed features for this projection
     transformed_features = []
     for j in range(len(wi)):
@@ -157,13 +166,6 @@ def fill_array_cy(wi, transforms, bounds, data_source, n_pts):
             data_source.data, wij, transform_type
         )
         transformed_features.append(transformed_col)
-    
-    cdef int i, j, nwt
-    cdef double projection_val, wt, xi_transformed
-    cdef int n_terms = len(wi)
-    cdef int total_invalid_points = 0
-    cdef int partial_invalid_points = 0
-    cdef int valid_points = 0
     
     # Convert to numpy arrays
     cdef np.ndarray[np.float64_t, ndim=2] transform_matrix = np.stack(
