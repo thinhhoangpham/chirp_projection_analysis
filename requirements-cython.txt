@@ -1,0 +1,8 @@
+# Cython build requirements
+# Install these to build the Cython extensions:
+#   pip install -r requirements-cython.txt
+
+Cython>=0.29.0
+numpy>=1.20.0
+setuptools>=45
+wheel
