@@ -108,17 +108,31 @@ from chirp_python.computation_cache import get_computation_cache
 # Global cache instance
 _computation_cache = get_computation_cache()
 
-from chirp_python.projection_vectorized import (
-    compute_bounds,
-    fill_array,
-    compute_projection_vectorized,
-    IncrementalProjection
-)
-from chirp_python.validation import (
-    validate_projection_bins,
-    validate_2d_projection_bins,
-    validate_incremental_term
-)
+# Try to import Cython-accelerated modules, fall back to pure Python if not available
+try:
+    from chirp_cython import (
+        compute_bounds,
+        fill_array,
+        compute_projection_vectorized,
+        validate_projection_bins,
+        validate_2d_projection_bins,
+        validate_incremental_term,
+        IncrementalProjection,
+        CYTHON_AVAILABLE
+    )
+except ImportError:
+    from chirp_python.projection_vectorized import (
+        compute_bounds,
+        fill_array,
+        compute_projection_vectorized,
+        IncrementalProjection
+    )
+    from chirp_python.validation import (
+        validate_projection_bins,
+        validate_2d_projection_bins,
+        validate_incremental_term
+    )
+    CYTHON_AVAILABLE = False
 
 def build_2d_bin_from_projections(xwt, ywt, x_transforms, y_transforms, n_bins, data_source, current_class, n_pts):
     """Build 2D bin from pre-computed projection weights with transformations
