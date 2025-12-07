@@ -104,10 +104,8 @@ def apply_feature_transform_vectorized(double[:, :] data, int feature_idx,
     elif transform_type == 'log':
         for i in range(n_samples):
             val = data[i, feature_idx]
-            if val > 0:
-                result_view[i] = log(val)
-            else:
-                result_view[i] = -1.0 / 0.0  # -inf
+            # Unsafe log - produces -inf for val <= 0, NaN for NaN
+            result_view[i] = log(val)
     elif transform_type == 'log_eps':
         for i in range(n_samples):
             val = data[i, feature_idx]

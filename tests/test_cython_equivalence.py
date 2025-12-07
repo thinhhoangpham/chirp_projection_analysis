@@ -58,12 +58,12 @@ def create_test_datasource(data):
     """Create a DataSource object for testing."""
     import pandas as pd
     
-    # Create a simple DataFrame
-    df = pd.DataFrame(data, columns=[f'feature_{i}' for i in range(data.shape[1])])
-    df['class'] = 0  # Add a class column
+    # Create class values array
+    n_samples = data.shape[0]
+    class_values = np.zeros(n_samples, dtype=int)
     
-    # Create DataSource
-    ds = DataSource(df, 'class')
+    # Create DataSource directly with data and class_values
+    ds = DataSource(data=data, class_values=class_values, class_names=['0'])
     return ds
 
 def test_feature_transforms():
@@ -150,9 +150,9 @@ def test_projection_bounds():
     
     # Test cases: different weight patterns and transforms
     test_cases = [
-        ([0, 1, 2], ['none', 'square', 'sqrt']),
-        ([0, -1, 2], ['none', 'log_eps', 'inverse_eps']),
-        ([3, 4], ['sigmoid_eps', 'logit_eps']),
+        (np.array([0, 1, 2]), ['none', 'square', 'sqrt']),
+        (np.array([0, -1, 2]), ['none', 'log_eps', 'inverse_eps']),
+        (np.array([3, 4]), ['sigmoid_eps', 'logit_eps']),
     ]
     
     all_passed = True
@@ -189,8 +189,8 @@ def test_fill_array():
     
     # Test cases
     test_cases = [
-        ([0, 1, 2], ['none', 'square', 'sqrt'], np.array([0.0, 10.0])),
-        ([0, -1, 2], ['none', 'log_eps', 'inverse_eps'], np.array([-5.0, 5.0])),
+        (np.array([0, 1, 2]), ['none', 'square', 'sqrt'], np.array([0.0, 10.0])),
+        (np.array([0, -1, 2]), ['none', 'log_eps', 'inverse_eps'], np.array([-5.0, 5.0])),
     ]
     
     all_passed = True
@@ -226,8 +226,8 @@ def test_projection_vectorized():
     
     # Test cases
     test_cases = [
-        ([0, 1, 2], ['none', 'square', 'sqrt']),
-        ([0, -1, 2], ['none', 'log_eps', 'inverse_eps']),
+        (np.array([0, 1, 2]), ['none', 'square', 'sqrt']),
+        (np.array([0, -1, 2]), ['none', 'log_eps', 'inverse_eps']),
     ]
     
     all_passed = True
