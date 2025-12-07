@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel", "Cython>=0.29.0", "numpy>=1.19.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chirp_cython"
+version = "1.0.0"
+description = "Cython-accelerated CHIRP projection analysis modules"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.19.0",
+]
+
+[project.optional-dependencies]
+cython = [
+    "Cython>=0.29.0",
+]

@@ -108,15 +108,35 @@ from chirp_python.computation_cache import get_computation_cache
 # Global cache instance
 _computation_cache = get_computation_cache()
 
+# Try to import Cython-accelerated versions, fall back to Python if not available
+CYTHON_AVAILABLE = False
+try:
+    from chirp_cython import (
+        compute_bounds_cy as compute_bounds,
+        fill_array_cy as fill_array,
+        validate_projection_bins_cy as validate_projection_bins,
+        validate_2d_projection_bins_cy as validate_2d_projection_bins,
+        CYTHON_AVAILABLE as _cython_flag
+    )
+    CYTHON_AVAILABLE = _cython_flag
+    print(f"[CHIRP] Using Cython-accelerated functions (3-8x speedup expected)")
+except ImportError:
+    from chirp_python.projection_vectorized import (
+        compute_bounds,
+        fill_array,
+    )
+    from chirp_python.validation import (
+        validate_projection_bins,
+        validate_2d_projection_bins,
+    )
+    print(f"[CHIRP] Using pure Python functions (Cython not available)")
+
+# Always import these from Python (complex stateful class and validation logic)
 from chirp_python.projection_vectorized import (
-    compute_bounds,
-    fill_array,
     compute_projection_vectorized,
     IncrementalProjection
 )
 from chirp_python.validation import (
-    validate_projection_bins,
-    validate_2d_projection_bins,
     validate_incremental_term
 )
 
