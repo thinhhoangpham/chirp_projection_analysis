@@ -18,24 +18,28 @@ from Cython.Build import cythonize
 import numpy as np
 
 # Define Cython extensions
+# Common configuration for all extensions
+common_define_macros = [('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')]
+common_include_dirs = [np.get_include()]
+
 extensions = [
     Extension(
         "chirp_cython.feature_transforms_cy",
         ["chirp_cython/feature_transforms_cy.pyx"],
-        include_dirs=[np.get_include()],
-        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
+        include_dirs=common_include_dirs,
+        define_macros=common_define_macros,
     ),
     Extension(
         "chirp_cython.projection_vectorized_cy",
         ["chirp_cython/projection_vectorized_cy.pyx"],
-        include_dirs=[np.get_include()],
-        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
+        include_dirs=common_include_dirs,
+        define_macros=common_define_macros,
     ),
     Extension(
         "chirp_cython.validation_cy",
         ["chirp_cython/validation_cy.pyx"],
-        include_dirs=[np.get_include()],
-        define_macros=[('NPY_NO_DEPRECATED_API', 'NPY_1_7_API_VERSION')],
+        include_dirs=common_include_dirs,
+        define_macros=common_define_macros,
     ),
 ]
 

@@ -14,7 +14,7 @@ Expected speedup: 5-10x over pure Python NumPy version
 
 import numpy as np
 cimport numpy as np
-from libc.math cimport log, sqrt, exp, fabs, isnan, isinf, isfinite
+from libc.math cimport log, sqrt, exp, fabs, isnan, isinf, isfinite, NAN, INFINITY
 cimport cython
 
 # Initialize NumPy C API
@@ -39,34 +39,6 @@ def get_epsilon_cy():
         Current epsilon value
     """
     return EPSILON
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef inline double _expit_stable(double z) nogil:
-    """Numerically stable logistic sigmoid for scalar.
-    
-    Uses numerically stable computation to avoid overflow:
-    - For z >= 0: 1/(1+exp(-z))
-    - For z < 0: exp(z)/(1+exp(z))
-    
-    Returns sigmoid clamped to [EPSILON, 1-EPSILON]
-    """
-    cdef double result
-    cdef double ez
-    
-    if z >= 0:
-        result = 1.0 / (1.0 + exp(-z))
-    else:
-        ez = exp(z)
-        result = ez / (1.0 + ez)
-    
-    # Clamp to avoid exact 0 or 1
-    if result < EPSILON:
-        result = EPSILON
-    elif result > 1.0 - EPSILON:
-        result = 1.0 - EPSILON
-    
-    return result
 
 def apply_transform_vectorized_cy(
     np.ndarray[np.float64_t, ndim=2] data,
@@ -117,7 +89,7 @@ def apply_transform_vectorized_cy(
             if x > 0:
                 result[i] = log(x)
             else:
-                result[i] = -1.0 / 0.0  # NaN
+                result[i] = NAN
     
     elif transform_type == 'log_eps':
         for i in range(n_pts):
@@ -130,7 +102,7 @@ def apply_transform_vectorized_cy(
             if x != 0:
                 result[i] = 1.0 / x
             else:
-                result[i] = 1.0 / 0.0  # Inf
+                result[i] = INFINITY
     
     elif transform_type == 'inverse_eps':
         for i in range(n_pts):
@@ -149,7 +121,7 @@ def apply_transform_vectorized_cy(
                 p = neg_result
             # No clamping
             if p <= 0 or p >= 1:
-                result[i] = 1.0 / 0.0  # Inf
+                result[i] = INFINITY
             else:
                 result[i] = log(p / (1.0 - p))
     

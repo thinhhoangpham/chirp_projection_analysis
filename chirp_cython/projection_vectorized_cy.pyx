@@ -14,7 +14,7 @@ Expected speedup: 3-5x over pure Python NumPy version
 
 import numpy as np
 cimport numpy as np
-from libc.math cimport isnan, isinf, isfinite
+from libc.math cimport isnan, isinf, isfinite, INFINITY
 cimport cython
 
 # Initialize NumPy C API
@@ -49,8 +49,8 @@ def compute_bounds_cy(data_source, wi, transforms, n_pts):
     # Declare C variables first
     cdef int i, j, nwt
     cdef double data_val, wt, xi_transformed
-    cdef double min_val = 1.0 / 0.0  # Inf
-    cdef double max_val = -1.0 / 0.0  # -Inf
+    cdef double min_val = INFINITY
+    cdef double max_val = -INFINITY
     cdef int n_terms = len(wi)
     cdef double bounds_range, center
     
@@ -108,8 +108,8 @@ def compute_bounds_cy(data_source, wi, transforms, n_pts):
             bounds[0] = center - data_source.FUZZ0
             bounds[1] = center + data_source.FUZZ0
     else:
-        bounds[0] = 1.0 / 0.0  # Inf
-        bounds[1] = -1.0 / 0.0  # -Inf
+        bounds[0] = INFINITY
+        bounds[1] = -INFINITY
     
     # Cache the result
     _computation_cache.cache_projection_bounds(wi, transforms, data_hash, bounds)
